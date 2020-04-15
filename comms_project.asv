@@ -21,20 +21,11 @@ gt_sq = @(t) abs((2*tripuls(t - .004, .004) - 4*tripuls(t - .005, .002))).^2;
 % Plot of g(t)
 t = 0:.000001:.006;
 gt = 2*tripuls(t - .004, .004) - 4*tripuls(t - .005, .002);
-% plot(t, gt)
+plot(t, gt)
 
-n = 100000;
-Gf_fft = fft(gt, n);
-plot(linspace(0,.00001, n/500), abs(Gf_fft(1:n/500)))
+Gf_fft = fft(gt);
+plot(t, Gf_fft)
 
-subplot(2,1,1)
-
-t = 0:.000001:.006;
-Gf = .004*sinc((pi*.004*t)/2).^2 .* exp(-1i*pi*2*t) - .004*sinc((pi*.002*t)/2).^2 .* exp(-1i*pi*5*t);
-plot(linspace(0,.00001, n/500), abs(Gf(1:n/500)))
-subplot(2,1,2)
-
-legend('show')
 
 % Energy from triangular pulse waveform
 E_tripuls = integral(gt_sq, 0, .006);
@@ -49,7 +40,7 @@ B_ess = B_step;
 
 format long
 
-% while E_ess < .99*E_gt
-%     B_ess = B_ess + B_step;
-%     E_ess = integral(Gf_sq, -B_ess, B_ess)
-% end
+while E_ess < .99*E_gt
+    B_ess = B_ess + B_step;
+    E_ess = integral(Gf_sq, -B_ess, B_ess)
+end
