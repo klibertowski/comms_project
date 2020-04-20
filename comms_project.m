@@ -30,7 +30,7 @@ plot(linspace(0,.00001, n/500), abs(Gf_fft(1:n/500)))
 subplot(2,1,1)
 
 t = 0:.000001:.006;
-Gf = .004*sinc((pi*.004*t)/2).^2 .* exp(-1i*pi*2*t) - .004*sinc((pi*.002*t)/2).^2 .* exp(-1i*pi*5*t);
+Gf = .004*sinc((.004*t)/2).^2 .* exp(-1i*pi*2*t*.004) - .004*sinc((.002*t)/2).^2 .* exp(-1i*pi*.005*t);
 plot(linspace(0,.00001, n/500), abs(Gf(1:n/500)))
 subplot(2,1,2)
 
@@ -40,11 +40,11 @@ legend('show')
 E_tripuls = integral(gt_sq, 0, .006);
 
 % G(f)^2
-Gf_sq = @(f) abs((.004*sinc((pi*.004*f)/2).^2 .* exp(-1i*pi*2*f) - .004*sinc((pi*.002*f)/2).^2 .* exp(-1i*pi*5*f)).^2);
+Gf_sq = @(f) abs((.004*sinc((.004*f)/2).^2 .* exp(-1i*pi*2*f*.004) - .004*sinc((.002*f)/2).^2 .* exp(-1i*pi*2*f*.005)).^2);
 
 % Setup for while loop
 E_ess = 0;
-B_step = 10;
+B_step = .1;
 B_ess = B_step;
 
 format long
@@ -53,3 +53,8 @@ format long
 %     B_ess = B_ess + B_step;
 %     E_ess = integral(Gf_sq, -B_ess, B_ess)
 % end
+
+% calculated from while loop
+B_ess_cal = 694.2;
+
+
