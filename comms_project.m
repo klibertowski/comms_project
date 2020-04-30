@@ -107,15 +107,139 @@ figure(6)
 plot(f, Gf_DSB)
 title('II-1 Coherent Demodulation f = 500Hz')
 
-% II-2
-BW = 1400;
-fc = 500;
-Wc = 2*pi*fc;
-
-t = linspace(0, .04, n);
 lpf = fir1(20, B_ess/(fs/2), 'low');
 demod = filter(lpf, 1, abs(Gf));
 figure(7)
 plot(linspace(-fs/2, fs/2, n), demod)
+
+% II-2
+fc = 1000;
+fs = 2*(B_ess + fc);
+
+BW = 1400;
+Wc = 2*pi*fc;
+
+t = 0:1/BW:.04;
+gt_DSB = (2*tripuls(t - .004, .004) - 4*tripuls(t - .005, .002)).*cos(Wc*t);
+figure(5)
+plot(t, gt_DSB)
+
+f = linspace(-2*BW, 2*BW, n);
+f_1 = f - fc;
+f_2 = f + fc;
+Gf_1 = .004*sinc((.004*f_1)/2).^2 .* exp(-1i*pi*2*f_1*.004) - .004*sinc((.002*f_1)/2).^2 .* exp(-1i*pi*2*.005*f_1);
+Gf_2 = .004*sinc((.004*f_2)/2).^2 .* exp(-1i*pi*2*f_2*.004) - .004*sinc((.002*f_2)/2).^2 .* exp(-1i*pi*2*.005*f_2);
+Gf_DSB = abs(Gf_1) + abs(Gf_2);
+figure(8)
+plot(f, Gf_DSB)
+
+t = linspace(0, .04, n);
+lpf = fir1(20, B_ess/(fs/2), 'low');
+demod = filter(lpf, 1, abs(Gf));
+figure(9)
+plot(linspace(-fs/2, fs/2, n), demod)
+
+% II-3
+A = 4;
+mod_idx = (max(gt) - min(gt)) / (2*A + max(gt) + min(gt));
+fc = 1000;
+fs = 2*(B_ess + fc);
+
+BW = 1400;
+Wc = 2*pi*fc;
+
+t = 0:1/BW:.04;
+gt_DSB = (2*tripuls(t - .004, .004) - 4*tripuls(t - .005, .002)).*cos(Wc*t);
+figure(5)
+plot(t, gt_DSB)
+
+f = linspace(-2*BW, 2*BW, n);
+f_1 = f - fc;
+f_2 = f + fc;
+Gf_1 = .004*sinc((.004*f_1)/2).^2 .* exp(-1i*pi*2*f_1*.004) - .004*sinc((.002*f_1)/2).^2 .* exp(-1i*pi*2*.005*f_1);
+Gf_2 = .004*sinc((.004*f_2)/2).^2 .* exp(-1i*pi*2*f_2*.004) - .004*sinc((.002*f_2)/2).^2 .* exp(-1i*pi*2*.005*f_2);
+Gf_DSB = abs(Gf_1) + abs(Gf_2);
+figure(8)
+plot(f, Gf_DSB)
+
+t = linspace(0, .04, n);
+lpf = fir1(20, B_ess/(fs/2), 'low');
+demod = filter(lpf, 1, abs(Gf));
+figure(9)
+plot(linspace(-fs/2, fs/2, n), demod)
 title('II-2 Double Sideband, Suppressed Carrier, f = 500Hz')
 
+% III-1
+fc = 1000;
+fs = 2*(B_ess + fc);
+
+BW = 1400;
+Wc = 2*pi*fc;
+
+f = linspace(-2*BW, 2*BW, n);
+f_1 = f - fc;
+f_2 = f + fc;
+Gf_1 = .004*sinc((.004*f_1)/2).^2 .* exp(-1i*pi*2*f_1*.004) - .004*sinc((.002*f_1)/2).^2 .* exp(-1i*pi*2*.005*f_1);
+Gf_2 = .004*sinc((.004*f_2)/2).^2 .* exp(-1i*pi*2*f_2*.004) - .004*sinc((.002*f_2)/2).^2 .* exp(-1i*pi*2*.005*f_2);
+Gf_SSB = abs(Gf_1) + abs(Gf_2);
+
+for i = 1:n
+    if abs(f(i)) < fc
+       Gf_SSB(i) = 0;
+    end
+end
+
+figure(10)
+plot(f, Gf_SSB)
+title('III-1 USB-SC ideal filter')
+
+% III-2
+fc = 1000;
+fs = 2*(B_ess + fc);
+
+BW = 1400;
+Wc = 2*pi*fc;
+
+f = linspace(-2*BW, 2*BW, n);
+f_1 = f - fc;
+f_2 = f + fc;
+Gf_1 = .004*sinc((.004*f_1)/2).^2 .* exp(-1i*pi*2*f_1*.004) - .004*sinc((.002*f_1)/2).^2 .* exp(-1i*pi*2*.005*f_1);
+Gf_2 = .004*sinc((.004*f_2)/2).^2 .* exp(-1i*pi*2*f_2*.004) - .004*sinc((.002*f_2)/2).^2 .* exp(-1i*pi*2*.005*f_2);
+Gf_SSB = abs(Gf_1) + abs(Gf_2);
+
+lpf = fir1(20, [fc/(fs/2), .999999], 'low');
+demod = filter(lpf, 1, abs(Gf_SSB));
+
+figure(11)
+plot(f, demod)
+title('III-2 USB-SC band-padd FIR filter')
+
+% III-3
+fc = 1000;
+fs = 2*(B_ess + fc);
+
+BW = 1400;
+Wc = 2*pi*fc;
+
+f = linspace(-2*BW, 2*BW, n);
+f_1 = f - fc;
+f_2 = f + fc;
+Gf_1 = .004*sinc((.004*f_1)/2).^2 .* exp(-1i*pi*2*f_1*.004) - .004*sinc((.002*f_1)/2).^2 .* exp(-1i*pi*2*.005*f_1);
+Gf_2 = .004*sinc((.004*f_2)/2).^2 .* exp(-1i*pi*2*f_2*.004) - .004*sinc((.002*f_2)/2).^2 .* exp(-1i*pi*2*.005*f_2);
+Gf_SSB = abs(Gf_1) + abs(Gf_2);
+
+for i = 1:n
+    F = abs(f(i));
+    if F > 970 && F < 1030
+        mult = .01667*F - .01617;
+        Gf_SSB(i) = Gf_SSB(i) * mult;
+    elseif F > 1.03 && F < 2000
+        % noop
+    else
+        Gf_SSB(i) = 0;
+    end
+end
+
+figure(12)
+plot(f, Gf_SSB)
+title('III-3 VSB modulated signal')
