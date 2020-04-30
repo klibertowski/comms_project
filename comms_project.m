@@ -50,31 +50,31 @@ BW = 1400;
 t = 0:1/BW:.04;
 gt = 2*tripuls(t - .004, .004) - 4*tripuls(t - .005, .002);
 stem(t, gt)
+title('I-2 Discrete plot of g(t)')
 
 n = 100000;
 f = linspace(0, BW, n);
 Gf_fft = fft(gt, n);
 figure(1)
 plot(f, abs(Gf_fft));
+title('I-3 |G(f)|')
 
 % subplot(2,1,1)
 
 Gf = .004*sinc((.004*f)/2).^2 .* exp(-1i*pi*2*f*.004) - .004*sinc((.002*f)/2).^2 .* exp(-1i*pi*2*.005*f);
 figure(2)
 plot(f, abs(Gf))
-% subplot(2,1,2)
-
-legend('show')
+title('I-4')
 
 % I-4
 gt_sq_int = @(t) abs(2*tripuls(t - .004, .004) - 4*tripuls(t - .005, .002)).^2;
-E_gt = integral(gt_sq_int, 0, 1)
+E_gt = integral(gt_sq_int, 0, 1);
 
 Gf_sq_int = @(f) abs((.004*sinc((.004*f)/2).^2 .* exp(-1i*pi*2*f*.004) - .004*sinc((.002*f)/2).^2 .* exp(-1i*pi*2*f*.005)).^2);
-E_gf = integral(Gf_sq_int, -1000000, 1000000)
+E_gf = integral(Gf_sq_int, -1000000, 1000000); 
 
 % I-5
-G_xcorr = xcorr(Gf);
+G_xcorr = xcorr(gt);
 figure(3)
 plot(linspace(-1000, 1000, length(G_xcorr)), G_xcorr)
 
@@ -83,5 +83,34 @@ figure(4)
 plot(f, G_ESD)
 
 % II-1
+fc = 500;
+fs = 2*(B_ess + fc);
 
+BW = 1400;
+Wc = 2*pi*fc;
+
+t = 0:1/BW:.04;
+gt_DSB = (2*tripuls(t - .004, .004) - 4*tripuls(t - .005, .002)).*cos(Wc*t);
+figure(5)
+plot(t, gt_DSB)
+
+f = linspace(-2*BW, 2*BW, n);
+f_1 = f - fc;
+f_2 = f + fc;
+Gf_1 = .004*sinc((.004*f_1)/2).^2 .* exp(-1i*pi*2*f_1*.004) - .004*sinc((.002*f_1)/2).^2 .* exp(-1i*pi*2*.005*f_1);
+Gf_2 = .004*sinc((.004*f_2)/2).^2 .* exp(-1i*pi*2*f_2*.004) - .004*sinc((.002*f_2)/2).^2 .* exp(-1i*pi*2*.005*f_2);
+Gf_DSB = abs(Gf_1) + abs(Gf_2);
+figure(6)
+plot(f, Gf_DSB)
+
+% II-2
+BW = 1400;
+fc = 500;
+Wc = 2*pi*fc;
+
+t = linspace(0, .04, n);
+lpf = fir1(20, B_ess/(fs/2), 'low');
+demod = filter(lpf, 1, abs(Gf));
+figure(7)
+plot(linspace(-fs/2, fs/2, n), demod)
 
