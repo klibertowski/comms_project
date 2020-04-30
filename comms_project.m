@@ -57,14 +57,14 @@ f = linspace(0, BW, n);
 Gf_fft = fft(gt, n);
 figure(1)
 plot(f, abs(Gf_fft));
-title('I-3 |G(f)|')
+title('I-3 |G(f)| Fast Fourier Transform')
 
 % subplot(2,1,1)
 
 Gf = .004*sinc((.004*f)/2).^2 .* exp(-1i*pi*2*f*.004) - .004*sinc((.002*f)/2).^2 .* exp(-1i*pi*2*.005*f);
 figure(2)
 plot(f, abs(Gf))
-title('I-4')
+title('?')
 
 % I-4
 gt_sq_int = @(t) abs(2*tripuls(t - .004, .004) - 4*tripuls(t - .005, .002)).^2;
@@ -77,10 +77,12 @@ E_gf = integral(Gf_sq_int, -1000000, 1000000);
 G_xcorr = xcorr(gt);
 figure(3)
 plot(linspace(-1000, 1000, length(G_xcorr)), G_xcorr)
+title('I-5 Autocorrelation Function')
 
 G_ESD = abs(Gf).^2;
 figure(4)
 plot(f, G_ESD)
+title('I-5 Energy Spectral Density |G(f)|^2')
 
 % II-1
 fc = 500;
@@ -93,6 +95,7 @@ t = 0:1/BW:.04;
 gt_DSB = (2*tripuls(t - .004, .004) - 4*tripuls(t - .005, .002)).*cos(Wc*t);
 figure(5)
 plot(t, gt_DSB)
+title('II-1 Double Sideband, Suppressed Carrier, f = 500Hz')
 
 f = linspace(-2*BW, 2*BW, n);
 f_1 = f - fc;
@@ -102,6 +105,7 @@ Gf_2 = .004*sinc((.004*f_2)/2).^2 .* exp(-1i*pi*2*f_2*.004) - .004*sinc((.002*f_
 Gf_DSB = abs(Gf_1) + abs(Gf_2);
 figure(6)
 plot(f, Gf_DSB)
+title('II-1 Coherent Demodulation f = 500Hz')
 
 % II-2
 BW = 1400;
@@ -113,4 +117,5 @@ lpf = fir1(20, B_ess/(fs/2), 'low');
 demod = filter(lpf, 1, abs(Gf));
 figure(7)
 plot(linspace(-fs/2, fs/2, n), demod)
+title('II-2 Double Sideband, Suppressed Carrier, f = 500Hz')
 
